@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -18,7 +20,8 @@ public class FilmController {
     private int idGenerator = 1;
 
     @PostMapping()
-    public Film createFilm(@RequestBody @Validated Film film){
+    public Film createFilm(@RequestBody @Valid Film film) throws ValidationException {
+        FilmValidator.validate(film);
         if (filmById.values().stream().noneMatch(u -> u.getName().equals(film.getName()))) {
             film.setId(idGenerator++);
             filmById.put(film.getId(), film);
@@ -26,18 +29,18 @@ public class FilmController {
             return film;
         } else {
             log.error("Film with this name {} already exist", film.getName());
-            throw new RuntimeException("Film with this name don't match");
+            throw new RuntimeException("Film with this name doesn't match");
         }
     }
 
     @PutMapping()
-    public Film update(@RequestBody @Validated Film film) {
+    public Film update(@RequestBody @Valid Film film) {
         if (filmById.containsKey(film.getId())) {
             filmById.put(film.getId(), film);
             return film;
         } else {
             log.error("Film with id = {} not found", film.getId());
-            throw new RuntimeException("Film with this id doesnt match");
+            throw new RuntimeException("Film with this id doesn't match");
         }
     }
 

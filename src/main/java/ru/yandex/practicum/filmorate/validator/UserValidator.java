@@ -21,7 +21,10 @@ public class UserValidator {
             log.info("Login is incorrect");
             throw new ValidationException("Login is incorrect");
         }
-
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.debug("Empty name - changed to login: {}", user);
+            user.setName(user.getLogin());
+        }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.info("Birthday can't be after local date");
             throw new ValidationException("Birthday can't be after local date");

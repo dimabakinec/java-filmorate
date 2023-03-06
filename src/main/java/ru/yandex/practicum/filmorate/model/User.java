@@ -14,11 +14,11 @@ import java.time.LocalDate;
 public class User {
 //    @Null
     private Integer id;
-//    @Email
+    @Email
     private String email;
-//    @NotBlank
+    @NotBlank
     private String login;
     private String name;
-//    @PastOrPresent
+    @PastOrPresent
     private LocalDate birthday;
 }
