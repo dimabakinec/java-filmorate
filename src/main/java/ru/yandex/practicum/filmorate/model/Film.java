@@ -9,14 +9,14 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class Film {
-    @Null
+//    @Null
     private Integer id;
-    @NotBlank
+//    @NotBlank
     private String name; // название
-    @Size(max = 200)
+//    @Size(max = 200)
     private String description; // описание
-    @NotNull
+//    @NotNull
     private LocalDate releaseDate; // дата релиза
-    @Positive
+//    @Positive
     private long duration; // продолжительность фильма
 }

@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+
+import javax.validation.Valid;
 import java.util.*;
 
 
@@ -37,7 +39,7 @@ public class UserController {
             return user;
         } else {
             log.error("User with id = {} not found", user.getId());
-            throw new RuntimeException("User with this id doesnt match");
+            throw new RuntimeException("User with this id doesn't match");
         }
     }
 
