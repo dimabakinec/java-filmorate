@@ -1,24 +1,25 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
+@FieldDefaults(level= AccessLevel.PRIVATE)
 public class User {
-//    @Null
-    private Integer id;
-    @Email
-    private String email;
-    @NotBlank
-    private String login;
-    private String name;
-    @PastOrPresent
-    private LocalDate birthday;
+    @NonNull
+    long id;
+    String email;
+    String login;
+    String name;
+    LocalDate birthday;
+    @JsonIgnore
+    Set<Long> friendsIdsSet;
 }

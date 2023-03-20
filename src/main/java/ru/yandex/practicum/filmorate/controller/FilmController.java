@@ -1,51 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.TypeOperations;
 
-import javax.validation.Valid;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
-@Validated
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmController {
-    private final Map<Integer, Film> filmById = new HashMap<>();
+    final FilmService filmService;
+    final String pathForFilmLike = "/{id}/like/{userId}";
 
-    private int idGenerator = 1;
-
-    @PostMapping()
-    public Film createFilm(@RequestBody @Valid Film film) throws ValidationException {
-        FilmValidator.validate(film);
-        if (filmById.values().stream().noneMatch(u -> u.getName().equals(film.getName()))) {
-            film.setId(idGenerator++);
-            filmById.put(film.getId(), film);
-            log.error("Film with this name {} added", film.getName());
-            return film;
-        } else {
-            log.error("Film with this name {} already exist", film.getName());
-            throw new RuntimeException("Film with this name doesn't match");
-        }
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
-    @PutMapping()
-    public Film update(@RequestBody @Valid Film film) {
-        if (filmById.containsKey(film.getId())) {
-            filmById.put(film.getId(), film);
-            return film;
-        } else {
-            log.error("Film with id = {} not found", film.getId());
-            throw new RuntimeException("Film with this id doesn't match");
-        }
+
+    @PostMapping
+    Film addNewFilm(@RequestBody Film film) {
+        log.info("POST request received to add movie");
+        return filmService.filmStorage.addNewFilm(film);
     }
+
+
+    @DeleteMapping(pathForFilmLike)
+    Film deleteLikeFromFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
+        log.info("Received a DELETE request to remove a like from a movie " + filmId);
+        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.DELETE.toString());
+    }
+
+
+    @PutMapping
+    Film updateFilm(@RequestBody Film film) {
+        log.info("Movie update PUT request received");
+        return filmService.filmStorage.updateFilm(film);
+    }
+
+    @PutMapping(pathForFilmLike)
+    Film addLikeToFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
+        log.info("PUT request received to add like to movie " + filmId);
+        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.ADD.toString());
+    }
+
 
     @GetMapping
-    public List<Film> getAllfilms() {
-        return new ArrayList<>(filmById.values());
+    Collection<Film> findFilms() {
+        log.info("Received a GET request to get a list of movies");
+        return filmService.filmStorage.findFilms();
+    }
+    @GetMapping("/{id}")
+    Film findFilm(@PathVariable("id") long filmId) {
+        return filmService.filmStorage.findFilm(filmId);
+    }
+    @GetMapping("/popular")
+    List<Film> findMostPopularFilms(@RequestParam(defaultValue = "10", name = "count") String countFilms) {
+        log.info("Received a GET request for a list of " + countFilms + " most popular films");
+        return filmService.findMostPopularFilms(countFilms);
     }
 }

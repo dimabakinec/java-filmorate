@@ -1,53 +1,74 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.service.TypeOperations;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;
-import java.util.*;
-
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
-@Validated
-
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
-    private final Map<Integer, User> userById = new HashMap<>();
+    final UserService userService;
+    final String pathForAddOrDeleteFriends = "/{id}/friends/{friendId}";
 
-    private int idGenerator = 1;
-
-    @PostMapping()
-    public User createUser(@RequestBody @Valid User user) throws ValidationException {
-        UserValidator.validate(user);
-        if (userById.values().stream().noneMatch(u -> u.getLogin().equals(user.getLogin()))) {
-            user.setId(idGenerator++);
-            userById.put(user.getId(), user);
-            log.error("User with this login {} added", user.getLogin());
-            return user;
-        } else {
-            log.error("User with this login {} already exist", user.getLogin());
-            throw new RuntimeException("User with this name doesn't match");
-        }
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
+
+    @PostMapping
+    User addNewUser(@RequestBody User user) {
+        log.info("POST request received to add user");
+        return userService.userStorage.addNewUser(user);
+    }
+
+
+    @DeleteMapping(pathForAddOrDeleteFriends)
+    User deleteFromFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
+        log.info("Received a DELETE request to unfriend a user" + firstUserId + " and " + secondUserId);
+        return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.DELETE.toString());
+    }
+
 
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user) {
-        if (userById.containsKey(user.getId())) {
-            userById.put(user.getId(), user);
-            return user;
-        } else {
-            log.error("User with id = {} not found", user.getId());
-            throw new RuntimeException("User with this id doesn't match");
-        }
+    User updateUser(@RequestBody User user) {
+        return userService.userStorage.updateUser(user);
     }
 
-    @GetMapping()
-    public List<User> getAllUsers() {
-        return new ArrayList<>(userById.values());
+    @PutMapping(pathForAddOrDeleteFriends)
+    User addToFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
+        log.info("Received PUT friend request from user" + firstUserId + " and " + secondUserId);
+        return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.ADD.toString());
+    }
+
+
+    @GetMapping
+    Collection<User> findUsers() {
+        log.info("GET request received to get information about all users");
+        return userService.userStorage.findUsers();
+    }
+    @GetMapping("/{id}")
+    User findUser(@PathVariable("id") long userId) {
+        log.info("GET request received for user information" + userId);
+        return userService.userStorage.findUser(userId);
+    }
+    @GetMapping("/{id}/friends/common/{otherId}")
+    List<User> getMutualFriends(@PathVariable("id") long firstUserId, @PathVariable("otherId") long secondUserId) {
+        log.info("A GET request received to get a list of mutual friends from users " + firstUserId + " and " + secondUserId);
+        return userService.getMutualFriends(firstUserId, secondUserId);
+    }
+    @GetMapping("/{id}/friends")
+    List<User> getFriendsSet(@PathVariable("id") long userId) {
+        log.info("A GET request was received to get the list of friends from the user " + userId);
+        return userService.getFriendsSet(userId);
     }
 }
