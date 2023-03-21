@@ -14,8 +14,8 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FilmControllerTest {
-    FilmController filmController;
-    Film film;
+    private static FilmController filmController;
+    private static Film film;
 
     @BeforeEach
     public void beforeEach() {
@@ -29,7 +29,7 @@ public class FilmControllerTest {
                 .name("NameFilm")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(180)
-                .usersWhoLiked(new HashSet<Long>())
+                .usersWhoLiked(new HashSet<>())
                 .build();
     }
 
