@@ -25,45 +25,43 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-
     @PostMapping
-    Film addNewFilm(@RequestBody Film film) {
+    public Film addNewFilm(@RequestBody Film film) {
         log.info("POST request received to add movie");
         return filmService.filmStorage.addNewFilm(film);
     }
 
-
     @DeleteMapping(pathForFilmLike)
-    Film deleteLikeFromFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
+    public Film deleteLikeFromFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("Received a DELETE request to remove a like from a movie " + filmId);
         return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.DELETE.toString());
     }
 
-
     @PutMapping
-    Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@RequestBody Film film) {
         log.info("Movie update PUT request received");
         return filmService.filmStorage.updateFilm(film);
     }
 
     @PutMapping(pathForFilmLike)
-    Film addLikeToFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
+    public Film addLikeToFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("PUT request received to add like to movie " + filmId);
         return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.ADD.toString());
     }
 
-
     @GetMapping
-    Collection<Film> findFilms() {
+    public Collection<Film> findFilms() {
         log.info("Received a GET request to get a list of movies");
         return filmService.filmStorage.findFilms();
     }
+
     @GetMapping("/{id}")
-    Film findFilm(@PathVariable("id") long filmId) {
+    public Film findFilm(@PathVariable("id") long filmId) {
         return filmService.filmStorage.findFilm(filmId);
     }
+
     @GetMapping("/popular")
-    List<Film> findMostPopularFilms(@RequestParam(defaultValue = "10", name = "count") String countFilms) {
+    public List<Film> findMostPopularFilms(@RequestParam(defaultValue = "10", name = "count") String countFilms) {
         log.info("Received a GET request for a list of " + countFilms + " most popular films");
         return filmService.findMostPopularFilms(countFilms);
     }
