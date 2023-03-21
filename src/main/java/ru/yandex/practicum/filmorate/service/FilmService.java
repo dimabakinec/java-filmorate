@@ -24,6 +24,16 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
+    public Film addNewFilm(Film film) {
+        log.info("Запрос на добавление нового фильма");
+        return filmStorage.addNewFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        log.info("Запрос на обновление данных фильма");
+        return filmStorage.updateFilm(film);
+    }
+
     public Film addOrDeleteLikeToFilm(long filmId, long userId, String typeOperation) {
         if (filmStorage.getFilms().containsKey(filmId)) {
             Film film = filmStorage.getFilms().get(filmId);
@@ -49,7 +59,6 @@ public class FilmService {
         } else {
             throw new NotFoundException("Movie with this id was not found");
         }
-
     }
 
     public List<Film> findMostPopularFilms(String countFilms) {
