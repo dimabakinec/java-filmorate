@@ -26,48 +26,48 @@ public class UserController {
     }
 
     @PostMapping
-    User addNewUser(@RequestBody User user) {
+    public User addNewUser(@RequestBody User user) {
         log.info("POST request received to add user");
         return userService.userStorage.addNewUser(user);
     }
 
     @DeleteMapping(pathForAddOrDeleteFriends)
-    User deleteFromFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
+    public User deleteFromFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
         log.info("Received a DELETE request to unfriend a user" + firstUserId + " and " + secondUserId);
         return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.DELETE.toString());
     }
 
     @PutMapping
-    User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         return userService.userStorage.updateUser(user);
     }
 
     @PutMapping(pathForAddOrDeleteFriends)
-    User addToFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
+    public User addToFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
         log.info("Received PUT friend request from user" + firstUserId + " and " + secondUserId);
         return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.ADD.toString());
     }
 
     @GetMapping
-    Collection<User> findUsers() {
+    public Collection<User> findUsers() {
         log.info("GET request received to get information about all users");
         return userService.userStorage.findUsers();
     }
 
     @GetMapping("/{id}")
-    User findUser(@PathVariable("id") long userId) {
+    public User findUser(@PathVariable("id") long userId) {
         log.info("GET request received for user information" + userId);
         return userService.userStorage.findUser(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    List<User> getMutualFriends(@PathVariable("id") long firstUserId, @PathVariable("otherId") long secondUserId) {
+    public List<User> getMutualFriends(@PathVariable("id") long firstUserId, @PathVariable("otherId") long secondUserId) {
         log.info("A GET request received to get a list of mutual friends from users " + firstUserId + " and " + secondUserId);
         return userService.getMutualFriends(firstUserId, secondUserId);
     }
 
     @GetMapping("/{id}/friends")
-    List<User> getFriendsSet(@PathVariable("id") long userId) {
+    public List<User> getFriendsSet(@PathVariable("id") long userId) {
         log.info("A GET request was received to get the list of friends from the user " + userId);
         return userService.getFriendsSet(userId);
     }
