@@ -9,10 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @FieldDefaults(level= AccessLevel.PRIVATE)
@@ -27,6 +24,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Map<Long, Film> getFilms() {
         return films;
+    }
+
+    @Override
+    public List<Film> findMostPopularFilms(int countFilms) {
+        return null;
     }
 
     public Film addNewFilm(Film film) {
