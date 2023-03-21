@@ -18,7 +18,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmController {
     final FilmService filmService;
-    final String pathForFilmLike = "/{id}/like/{userId}";
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -31,7 +30,7 @@ public class FilmController {
         return filmService.filmStorage.addNewFilm(film);
     }
 
-    @DeleteMapping(pathForFilmLike)
+    @DeleteMapping("/{id}/like/{userId}")
     public Film deleteLikeFromFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("Received a DELETE request to remove a like from a movie " + filmId);
         return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.DELETE.toString());
@@ -43,7 +42,7 @@ public class FilmController {
         return filmService.filmStorage.updateFilm(film);
     }
 
-    @PutMapping(pathForFilmLike)
+    @PutMapping("/{id}/like/{userId}")
     public Film addLikeToFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("PUT request received to add like to movie " + filmId);
         return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.ADD.toString());
