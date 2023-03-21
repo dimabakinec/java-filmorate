@@ -71,7 +71,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
 
-    boolean validateName(Film film) {
+    public boolean validateName(Film film) {
         if (film.getName() != null && film.getName().length() > 0) {
             return  true;
         } else {
@@ -79,7 +79,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    boolean validateDescription(Film film) {
+    public boolean validateDescription(Film film) {
         if (film.getDescription().length() <= MAX_LENGTH_DESCRIPTION) {
             return true;
         } else {
@@ -87,7 +87,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    boolean validateReleaseDate(Film film) {
+    public boolean validateReleaseDate(Film film) {
         if (!film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
             return true;
         } else {
@@ -95,7 +95,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    boolean validateDuration(Film film) {
+    public boolean validateDuration(Film film) {
         if (film.getDuration() > MIN_DURATION) {
             return true;
         } else {
@@ -103,7 +103,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    boolean validateFilmFields(Film film) {
+    public boolean validateFilmFields(Film film) {
         return validateName(film) && validateDescription(film) && validateReleaseDate(film) && validateDuration(film);
     }
 }
