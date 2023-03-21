@@ -61,10 +61,10 @@ public class FilmService {
         }
     }
 
-    public List<Film> findMostPopularFilms(String countFilms) {
+    public List<Film> findMostPopularFilms(int countFilms) {
         return filmStorage.findFilms().stream()
                 .sorted((o1, o2) -> (int) (o2.getCountLikes() - o1.getCountLikes()))
-                .limit(Long.parseLong(countFilms))
+                .limit((countFilms))
                 .collect(Collectors.toList());
     }
 }
