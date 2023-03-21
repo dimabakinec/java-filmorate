@@ -13,9 +13,9 @@ import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FilmControllerTest {
-    private static FilmController filmController;
-    private static Film film;
+ class FilmControllerTest {
+    private FilmController filmController;
+    private Film film;
 
     @BeforeEach
     public void beforeEach() {

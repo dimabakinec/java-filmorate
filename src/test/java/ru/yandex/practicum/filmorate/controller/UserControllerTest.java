@@ -12,9 +12,9 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UserControllerTest {
-    private static UserController userController;
-    private static User user;
+ class UserControllerTest {
+    private UserController userController;
+    private User user;
     @BeforeEach
     public void BeforeEach() {
         userController = new UserController(new UserService(new InMemoryUserStorage()));
