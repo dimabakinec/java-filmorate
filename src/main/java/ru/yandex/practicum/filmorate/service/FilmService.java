@@ -36,7 +36,7 @@ public class FilmService {
 
     public Film addOrDeleteLikeToFilm(long filmId, long userId, String typeOperation) {
         if (filmStorage.getFilms().containsKey(filmId)) {
-            Film film = filmStorage.getFilms().get(filmId);
+            Film film = filmStorage.findFilm(filmId);
             Set<Long> newSetWithLikes = film.getUsersWhoLiked();
             switch (typeOperation) {
                 case ("DELETE"):
