@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,21 +26,21 @@ public class FilmService {
     }
 
     public Film addNewFilm(Film film) {
-        log.info("Запрос на добавление нового фильма");
+        log.info("Request to add a new movie");
         return filmStorage.addNewFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        log.info("Запрос на обновление данных фильма");
+        log.info("Movie data update request");
         return filmStorage.updateFilm(film);
     }
 
-    public Film addOrDeleteLikeToFilm(long filmId, long userId, String typeOperation) {
+    public Film addOrDeleteLikeToFilm(long filmId, long userId, TypeOperations typeOperation) {
         if (filmStorage.getFilms().containsKey(filmId)) {
             Film film = filmStorage.findFilm(filmId);
             Set<Long> newSetWithLikes = film.getUsersWhoLiked();
             switch (typeOperation) {
-                case ("DELETE"):
+                case DELETE:
                     if (newSetWithLikes.contains(userId)) {
                         newSetWithLikes.remove(userId);
                     } else {
@@ -47,7 +48,7 @@ public class FilmService {
                     }
                     log.info("Removed like from user");
                     break;
-                case ("ADD"):
+                case ADD:
                     newSetWithLikes.add(userId);
                     log.info("Added like from user");
                     break;
