@@ -3,22 +3,20 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validation.FilmValidation;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @Component
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-    static final int MAX_LENGTH_DESCRIPTION = 200;
-    static final int MIN_DURATION = 0;
-    static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
+    final FilmValidation filmValidation = new FilmValidation();
     long nextId = 1;
     final Map<Long, Film> films = new HashMap<>();
 
@@ -26,13 +24,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films;
     }
 
-    @Override
-    public List<Film> findMostPopularFilms(int countFilms) {
-        return null;
-    }
-
     public Film addNewFilm(Film film) {
-        if (validateFilmFields(film)) {
+        if (filmValidation.validateFilmFields(film)) {
             film.setId(nextId++);
             film.setUsersWhoLiked(new HashSet<>());
             films.put(film.getId(), film);
@@ -44,7 +37,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film updateFilm(Film film) {
-        if (validateFilmFields(film)) {
+        if (filmValidation.validateFilmFields(film)) {
             if (!films.containsKey(film.getId())) {
                 log.debug("Movie with this id does not exist");
                 throw new NotFoundException("Movie with this id does not exist");
@@ -70,42 +63,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new NotFoundException("Movie with this id does not exist");
         }
-    }
-
-
-    public boolean validateName(Film film) {
-        if (film.getName() != null && film.getName().length() > 0) {
-            return  true;
-        } else {
-            throw new ValidationException("Movie title cannot be empty");
-        }
-    }
-
-    public boolean validateDescription(Film film) {
-        if (film.getDescription().length() <= MAX_LENGTH_DESCRIPTION) {
-            return true;
-        } else {
-            throw new ValidationException("Maximum description length - 200 characters");
-        }
-    }
-
-    public boolean validateReleaseDate(Film film) {
-        if (!film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            return true;
-        } else {
-            throw new ValidationException("The release date of the film cannot be earlier than 28.12.1895");
-        }
-    }
-
-    public boolean validateDuration(Film film) {
-        if (film.getDuration() > MIN_DURATION) {
-            return true;
-        } else {
-            throw new ValidationException("Movie length must be greater than 0");
-        }
-    }
-
-    public boolean validateFilmFields(Film film) {
-        return validateName(film) && validateDescription(film) && validateReleaseDate(film) && validateDuration(film);
     }
 }

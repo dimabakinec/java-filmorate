@@ -3,29 +3,32 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validation.UserValidation;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 @FieldDefaults(level= AccessLevel.PRIVATE)
 @Component
+@Qualifier("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
+    final UserValidation userValidation = new UserValidation();
     long nextId = 1;
     final Map<Long, User> users = new HashMap<>();
 
     public Map<Long, User> getUsers() {
         return users;
     }
+
     public User addNewUser(User user) {
         if (user.getName() == null || Objects.equals(user.getName(), "") || Objects.equals(user.getName(), " ")) {
             user.setName(user.getLogin());
         }
-        if (validateUserFields(user)) {
+        if (userValidation.validateUserFields(user)) {
             user.setId(nextId++);
             user.setFriendsIdsSet(new HashSet<>());
             users.put(user.getId(), user);
@@ -37,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User updateUser(User user) {
-        if (validateUserFields(user)) {
+        if (userValidation.validateUserFields(user)) {
             if (!users.containsKey(user.getId())) {
                 log.debug("User with this id does not exist");
                 throw new NotFoundException("User with this id does not exist");
@@ -66,38 +69,5 @@ public class InMemoryUserStorage implements UserStorage {
         } else {
             throw new NotFoundException("User with this id was not found");
         }
-    }
-
-
-    boolean validateEmail(User user) {
-        if (user.getEmail() == null || user.getEmail().length() == 0) {
-            throw new ValidationException("Email field cannot be empty");
-        } else if (!user.getEmail().contains("@")) {
-            throw new ValidationException("The Email field must contain the @ symbol");
-        } else {
-            return true;
-        }
-    }
-
-    boolean validateLogin(User user) {
-        if (user.getLogin() == null || user.getLogin().length() == 0) {
-            throw new ValidationException("Login field cannot be empty");
-        } else if (user.getLogin().contains(" ")) {
-            throw new ValidationException("The Login field cannot contain spaces");
-        } else {
-            return true;
-        }
-    }
-
-    boolean validateBirthday(User user) {
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Date of birth cannot be greater than the current date");
-        } else {
-            return true;
-        }
-    }
-
-    boolean validateUserFields(User user) {
-        return validateEmail(user) && validateLogin(user) && validateBirthday(user);
     }
 }
