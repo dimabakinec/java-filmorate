@@ -24,8 +24,8 @@ public class UserService {
     }
 
     public User addOrDeleteToFriends(long firstUserId, long secondUserId, String typeOperation) {
-        User firstUser = userStorage.getUsers().get(firstUserId);
-        User secondUser =userStorage.getUsers().get(secondUserId);
+        User firstUser = userStorage.findUser(firstUserId);
+        User secondUser =userStorage.findUser(secondUserId);
         if (firstUser != null && secondUser != null) {
             Set<Long> firstUserFriendsSet = firstUser.getFriendsIdsSet();
             Set<Long> secondUserFriendsSet = secondUser.getFriendsIdsSet();
@@ -54,8 +54,6 @@ public class UserService {
         List<User> anotherUser = getFriendsSet(secondUserId);
         return user.stream().filter(anotherUser::contains).collect(Collectors.toList());
     }
-
-
 
     public List<User> getFriendsSet(long userId) {
         List<User> friendsSet = new ArrayList<>();
