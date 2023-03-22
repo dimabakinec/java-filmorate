@@ -50,30 +50,12 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(long firstUserId, long secondUserId) {
-        User firstUser = userStorage.getUsers().get(firstUserId);
-        User secondUser = userStorage.getUsers().get(secondUserId);
-        if (firstUser != null && secondUser != null) {
-            List<Long> firstUserFriendsList = firstUser.getFriendsIdsSet().stream().collect(Collectors.toList());
-            List<Long> secondUserFriendsList = secondUser.getFriendsIdsSet().stream().collect(Collectors.toList());
-            List<Long> mutualFriendsIdsList = new ArrayList<>();
-            for (long firstFriendFriendId : firstUserFriendsList) {
-                for (int j = 0; j < secondUserFriendsList.size(); j++) {
-                    if (secondUserFriendsList.contains(firstFriendFriendId)) {
-                        mutualFriendsIdsList.add(firstFriendFriendId);
-                    }
-                }
-            }
-            List<User> mutualFriendsList = new ArrayList<>();
-            for (User user : userStorage.getUsers().values()) {
-                if (mutualFriendsIdsList.contains(user.getId())) {
-                    mutualFriendsList.add(user);
-                }
-            }
-            return mutualFriendsList;
-        } else {
-            throw new NotFoundException("User with this id does not exist");
-        }
+        List<User> user = getFriendsSet(firstUserId);
+        List<User> anotherUser = getFriendsSet(secondUserId);
+        return user.stream().filter(anotherUser::contains).collect(Collectors.toList());
     }
+
+
 
     public List<User> getFriendsSet(long userId) {
         List<User> friendsSet = new ArrayList<>();
