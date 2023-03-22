@@ -33,7 +33,7 @@ public class FilmController {
     @DeleteMapping("/{id}/like/{userId}")
     public Film deleteLikeFromFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("Received a DELETE request to remove a like from a movie " + filmId);
-        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.DELETE.toString());
+        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.DELETE);
     }
 
     @PutMapping
@@ -45,7 +45,7 @@ public class FilmController {
     @PutMapping("/{id}/like/{userId}")
     public Film addLikeToFilm(@PathVariable("id") long filmId, @PathVariable("userId") Long userId) {
         log.info("PUT request received to add like to movie " + filmId);
-        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.ADD.toString());
+        return filmService.addOrDeleteLikeToFilm(filmId, userId, TypeOperations.ADD);
     }
 
     @GetMapping

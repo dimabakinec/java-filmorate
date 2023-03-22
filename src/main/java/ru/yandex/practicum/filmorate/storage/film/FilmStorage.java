@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public interface FilmStorage {
@@ -12,5 +11,4 @@ public interface FilmStorage {
     Collection<Film> findFilms();
     Film findFilm(long filmId);
     Map<Long, Film> getFilms();
-    List<Film> findMostPopularFilms(int countFilms);
 }
