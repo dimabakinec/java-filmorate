@@ -1,70 +1,68 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 @Service
-@Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmService {
-    public final FilmStorage filmStorage;
+
+    private int nextId = 0;
+    private final FilmStorage filmStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
-    public Film addNewFilm(Film film) {
-        log.info("Request to add a new movie");
-        return filmStorage.addNewFilm(film);
+    private int generateId() {
+        return ++nextId;
     }
 
-    public Film updateFilm(Film film) {
-        log.info("Movie data update request");
-        return filmStorage.updateFilm(film);
+    public Film findFilmById(final int id) {
+        return filmStorage.findFilmById(id);
     }
 
-    public Film addOrDeleteLikeToFilm(long filmId, long userId, TypeOperations typeOperation) {
-        if (filmStorage.getFilms().containsKey(filmId)) {
-            Film film = filmStorage.findFilm(filmId);
-            Set<Long> newSetWithLikes = film.getUsersWhoLiked();
-            switch (typeOperation) {
-                case DELETE:
-                    if (newSetWithLikes.contains(userId)) {
-                        newSetWithLikes.remove(userId);
-                    } else {
-                        throw new NotFoundException("This user did not like this movie, deletion is impossible");
-                    }
-                    log.info("Removed like from user");
-                    break;
-                case ADD:
-                    newSetWithLikes.add(userId);
-                    log.info("Added like from user");
-                    break;
-                default:
-                    break;
-            }
-            film.setUsersWhoLiked(newSetWithLikes);
-            return film;
-        } else {
-            throw new NotFoundException("Movie with this id was not found");
+    public void addFilm(final Film film) {
+        film.setId(generateId());
+        filmStorage.addFilm(film);
+    }
+
+    public Film updateFilm(final Film film) {
+        filmStorage.updateFilm(film);
+        return film;
+    }
+
+    public void deleteFilm(final int id) {
+        filmStorage.deleteFilm(id);
+    }
+
+    public Collection<Film> findAllFilms() {
+        return filmStorage.findAllFilms();
+    }
+
+    public void addLike(final int id, final int userId) {
+        final Film film;
+        film = filmStorage.findFilmById(id);
+        film.addLike(userId);
+        filmStorage.updateFilm(film);
+    }
+
+    public void deleteLike(final int id, final int userId) {
+        final Film film;
+        film = filmStorage.findFilmById(id);
+        if (!film.getLikes().contains(userId)) {
+            throw new NotFoundException("This user never liked this film in the first place");
         }
+        film.deleteLike(userId);
     }
 
-    public List<Film> findMostPopularFilms(int countFilms) {
-        return filmStorage.findFilms().stream()
-                .sorted((o1, o2) -> (int) (o2.getCountLikes() - o1.getCountLikes()))
-                .limit((countFilms))
-                .collect(Collectors.toList());
+    public Collection<Film> findPopularFilms(final int count) {
+        return filmStorage.findPopularFilms(count);
     }
+
 }

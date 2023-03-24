@@ -1,66 +1,82 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
-@FieldDefaults(level = AccessLevel.PUBLIC)
 public class UserService {
-    final UserStorage userStorage;
+
+    private int nextId = 0;
+    private final UserStorage userStorage;
 
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public User addOrDeleteToFriends(long firstUserId, long secondUserId, String typeOperation) {
-        User firstUser = userStorage.findUser(firstUserId);
-        User secondUser =userStorage.findUser(secondUserId);
-        if (firstUser != null && secondUser != null) {
-            Set<Long> firstUserFriendsSet = firstUser.getFriendsIdsSet();
-            Set<Long> secondUserFriendsSet = secondUser.getFriendsIdsSet();
-            switch (typeOperation) {
-                case "DELETE":
-                    firstUserFriendsSet.remove(secondUser.getId());
-                    secondUserFriendsSet.remove(firstUser.getId());
-                    break;
-                case "ADD":
-                    firstUserFriendsSet.add(secondUser.getId());
-                    secondUserFriendsSet.add(firstUser.getId());
-                    break;
-                default:
-                    break;
-            }
-            firstUser.setFriendsIdsSet(firstUserFriendsSet);
-            secondUser.setFriendsIdsSet(secondUserFriendsSet);
-            return firstUser;
-        } else {
-            throw new NotFoundException("User with this id does not exist");
-        }
+    private int generateId() {
+        return ++nextId;
     }
 
-    public List<User> getMutualFriends(long firstUserId, long secondUserId) {
-        List<User> user = getFriendsSet(firstUserId);
-        List<User> anotherUser = getFriendsSet(secondUserId);
-        return user.stream().filter(anotherUser::contains).collect(Collectors.toList());
+    public User findUserById(final int id) {
+        return userStorage.findUserById(id);
     }
 
-    public List<User> getFriendsSet(long userId) {
-        List<User> friendsSet = new ArrayList<>();
-        Set<Long> friendsIdsSet = userStorage.getUsers().get(userId).getFriendsIdsSet();
-        for (long friendId : friendsIdsSet) {
-            friendsSet.add(userStorage.getUsers().get(friendId));
+    public Collection<User> findUserFriends(final int id) {
+        return userStorage.findUserFriends(id);
+    }
+
+    public void addUser(final User user) {
+        user.setId(generateId());
+        userStorage.addUser(user);
+    }
+
+    public User updateUser(final User user) {
+        userStorage.updateUser(user);
+        return user;
+    }
+
+    public void deleteUser(final int id) {
+        userStorage.deleteUser(id);
+    }
+
+    public Collection<User> findAllUsers() {
+        return userStorage.findAllUsers();
+    }
+
+    public void addFriend(final int userId, final int friendId) {
+        User user;
+        user = userStorage.findUserById(userId);
+        user.addFriend(friendId);
+        userStorage.updateUser(user);
+        user = userStorage.findUserById(friendId);
+        user.addFriend(userId);
+        userStorage.updateUser(user);
+    }
+
+    public void deleteFriend(final int userId, final int friendId) {
+        final User user;
+        user = userStorage.findUserById(userId);
+        user.deleteFriend(friendId);
+        userStorage.updateUser(user);
+    }
+
+    public Collection<User> findCommonFriends(final int id, final int otherId) {
+        final Set<Integer> commonFriendsIds1;
+        final Set<Integer> commonFriendsIds2;
+        final Set<Integer> result = new HashSet<>();
+        commonFriendsIds1 = userStorage.findUserById(id).getFriends();
+        commonFriendsIds2 = userStorage.findUserById(otherId).getFriends();
+        result.addAll(commonFriendsIds1);
+        result.retainAll(commonFriendsIds2);
+        List<User> commonFriends = new ArrayList<>();
+        for (final int commonFriendsIds : result) {
+            commonFriends.add(userStorage.findUserById(commonFriendsIds));
         }
-        return friendsSet;
+        return commonFriends;
     }
 }

@@ -1,74 +1,94 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.TypeOperations;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/users")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
-    final UserService userService;
-    final String pathForAddOrDeleteFriends = "/{id}/friends/{friendId}";
-
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    private UserService userService;
+
+    @PostMapping(value = "/users")
+    public User create(@RequestBody User user) throws ValidationException {
+        UserValidator.validate(user);
+        if (user.getName() == null || user.getName().equals("")) {
+            log.info("Login is instead of name");
+            user.setName(user.getLogin());
+        }
+        userService.addUser(user);
+        log.info(user.toString());
+        return user;
     }
 
-    @PostMapping
-    public User addNewUser(@RequestBody User user) {
-        log.info("POST request received to add user");
-        return userService.userStorage.addNewUser(user);
+    @PutMapping("/users")
+    public User update(@RequestBody User user) {
+        if (userService.findUserById(user.getId()) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        UserValidator.validate(user);
+        if (user.getName() == null || user.getName().equals("")) {
+            log.info("Login is instead of name");
+            user.setName(user.getLogin());
+        }
+        userService.updateUser(user);
+        log.info(user.toString());
+        return user;
     }
 
-    @DeleteMapping(pathForAddOrDeleteFriends)
-    public User deleteFromFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
-        log.info("Received a DELETE request to unfriend a user" + firstUserId + " and " + secondUserId);
-        return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.DELETE.toString());
+    @GetMapping("/users")
+    public Collection<User> findAll() {
+        return userService.findAllUsers();
     }
 
-    @PutMapping
-    public User updateUser(@RequestBody User user) {
-        return userService.userStorage.updateUser(user);
+    @GetMapping("/users/{id}")
+    public User findUserById(@PathVariable int id) {
+        if (userService.findUserById(id) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        return userService.findUserById(id);
     }
 
-    @PutMapping(pathForAddOrDeleteFriends)
-    public User addToFriend(@PathVariable("id") long firstUserId, @PathVariable("friendId") long secondUserId) {
-        log.info("Received PUT friend request from user" + firstUserId + " and " + secondUserId);
-        return userService.addOrDeleteToFriends(firstUserId, secondUserId, TypeOperations.ADD.toString());
+    @GetMapping("/users/{id}/friends")
+    public Collection<User> findUserFriends(@PathVariable int id) {
+        if (userService.findUserById(id) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        return userService.findUserFriends(id);
     }
 
-    @GetMapping
-    public Collection<User> findUsers() {
-        log.info("GET request received to get information about all users");
-        return userService.userStorage.findUsers();
+
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        if (userService.findUserById(id) == null || userService.findUserById(friendId) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        userService.addFriend(id, friendId);
     }
 
-    @GetMapping("/{id}")
-    public User findUser(@PathVariable("id") long userId) {
-        log.info("GET request received for user information" + userId);
-        return userService.userStorage.findUser(userId);
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.deleteFriend(id, friendId);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable("id") long firstUserId, @PathVariable("otherId") long secondUserId) {
-        log.info("A GET request received to get a list of mutual friends from users " + firstUserId + " and " + secondUserId);
-        return userService.getMutualFriends(firstUserId, secondUserId);
-    }
-
-    @GetMapping("/{id}/friends")
-    public List<User> getFriendsSet(@PathVariable("id") long userId) {
-        log.info("A GET request was received to get the list of friends from the user " + userId);
-        return userService.getFriendsSet(userId);
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        if (userService.findUserById(id) == null || userService.findUserById(otherId) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        return userService.findCommonFriends(id, otherId);
     }
 }
