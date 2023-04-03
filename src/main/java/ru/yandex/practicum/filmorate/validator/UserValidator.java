@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Slf4j
 public class UserValidator {
-    public static void validate(User user) throws ValidationException {
+    public static void validate(final User user) throws ValidationException {
         if (user.getEmail() == null || user.getEmail().equals("")) {
             log.info("Email is empty");
             throw new ValidationException("Email is empty.");
@@ -21,13 +21,10 @@ public class UserValidator {
             log.info("Login is incorrect");
             throw new ValidationException("Login is incorrect");
         }
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.debug("Empty name - changed to login: {}", user);
-            user.setName(user.getLogin());
-        }
+
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Birthday can't be after local date");
-            throw new ValidationException("Birthday can't be after local date");
+            log.info("Birthday can't be in future");
+            throw new ValidationException("Birthday can't be in future.");
         }
     }
 }
