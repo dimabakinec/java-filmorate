@@ -67,7 +67,8 @@ ___
 Таблица содержит список фильмов.   
 Каждый фильм идентифицируется целочисленным идентификатором (film_id).  
 Поля название (name), описание (description), продолжительность фильма (duration) и
-идентификатор рейтинга (mpa_id) - обязательно должны содержать данные.  
+Идентификатор рейтинга (mpa_id) - обязательно должны содержать данные.
+Поле (release_date) - обязательно для заполнения.
 Максимальная длина описания — 200 символов.
 
 #### Таблица genre
@@ -134,7 +135,7 @@ AND friend_id in (SELECT friend_id
 ```
 SELECT fl.film_id, f.name, COUNT(pf.id_user) AS count
 FROM film_likes AS fl
-INNER JOIN films AS f ON fl fl.film_id = f.film_id
+INNER JOIN films AS f ON fl.film_id = f.film_id
 GROUP BY fl.film_id, f.name
 ORDER BY count DESC
 LIMIT 10;
