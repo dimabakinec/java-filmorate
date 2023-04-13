@@ -81,3 +81,4 @@ public class UserValidatorTest {
         assertDoesNotThrow(() -> UserValidator.validate(user));
     }
 }
+

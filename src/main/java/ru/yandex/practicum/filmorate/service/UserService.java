@@ -1,41 +1,59 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.*;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
-    private int nextId = 0;
     private final UserStorage userStorage;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
-    private int generateId() {
-        return ++nextId;
-    }
-
     public User findUserById(final int id) {
-        return userStorage.findUserById(id);
+        User user = userStorage.findUserById(id);
+        if (user == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        return user;
     }
 
     public Collection<User> findUserFriends(final int id) {
+        if (userStorage.findUserById(id) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
         return userStorage.findUserFriends(id);
     }
 
-    public void addUser(final User user) {
-        user.setId(generateId());
-        userStorage.addUser(user);
+    public User addUser(final User user) {
+        UserValidator.validate(user);
+        if (user.getName() == null || user.getName().equals("")) {
+            log.info("Login is instead of name");
+            user.setName(user.getLogin());
+        }
+        int id = userStorage.addUser(user);
+        user.setId(id);
+        return user;
     }
 
     public User updateUser(final User user) {
+        if (userStorage.findUserById(user.getId()) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        UserValidator.validate(user);
+        if (user.getName() == null || user.getName().equals("")) {
+            log.info("Login is instead of name");
+            user.setName(user.getLogin());
+        }
         userStorage.updateUser(user);
         return user;
     }
@@ -49,34 +67,28 @@ public class UserService {
     }
 
     public void addFriend(final int userId, final int friendId) {
-        User user;
-        user = userStorage.findUserById(userId);
-        user.addFriend(friendId);
-        userStorage.updateUser(user);
-        user = userStorage.findUserById(friendId);
-        user.addFriend(userId);
-        userStorage.updateUser(user);
+        if (userStorage.findUserById(userId) == null || userStorage.findUserById(friendId) == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
+        }
+        userStorage.addFriendship(userId, friendId);
     }
 
     public void deleteFriend(final int userId, final int friendId) {
-        final User user;
-        user = userStorage.findUserById(userId);
-        user.deleteFriend(friendId);
-        userStorage.updateUser(user);
+        userStorage.deleteFriend(userId, friendId);
     }
 
     public Collection<User> findCommonFriends(final int id, final int otherId) {
-        final Set<Integer> commonFriendsIds1;
-        final Set<Integer> commonFriendsIds2;
-        final Set<Integer> result = new HashSet<>();
-        commonFriendsIds1 = userStorage.findUserById(id).getFriends();
-        commonFriendsIds2 = userStorage.findUserById(otherId).getFriends();
-        result.addAll(commonFriendsIds1);
-        result.retainAll(commonFriendsIds2);
-        List<User> commonFriends = new ArrayList<>();
-        for (final int commonFriendsIds : result) {
-            commonFriends.add(userStorage.findUserById(commonFriendsIds));
+        User user = userStorage.findUserById(id);
+        User otherUser = userStorage.findUserById(otherId);
+        if (user == null || otherUser == null) {
+            log.info("User not found");
+            throw new NotFoundException("User not found");
         }
-        return commonFriends;
+        final Set<User> result = new HashSet<>();
+        result.addAll(user.getFriends());
+        result.retainAll(otherUser.getFriends());
+
+        return result;
     }
 }
