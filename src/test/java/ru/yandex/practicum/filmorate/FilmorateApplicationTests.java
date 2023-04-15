@@ -152,8 +152,7 @@ class FilmorateApplicationTests {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> filmService.findModelById(999));
-		assertEquals("model was not found by the passed ID: 999", exception.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: 999", exception.getMessage(), "exception проверки неверный");
 	}
 
 	@Test
@@ -211,8 +210,7 @@ class FilmorateApplicationTests {
 
 		assertEquals(1, usersList.size(), "Размер списка пользователей не соответствует ожидаемому");
 		assertEquals(user.getId(), usersList.get(0).getId(), "ID сформирован не верно");
-		assertEquals(userService.findModelById(user.getId()).getId(), usersList.get(0).getId()
-				, "Модели User не соответствуют");
+		assertEquals(userService.findModelById(user.getId()).getId(), usersList.get(0).getId(), "Модели User не соответствуют");
 
 		User friend = User.builder()
 				.email("mail@yandex.ru")
@@ -245,8 +243,7 @@ class FilmorateApplicationTests {
 		assertEquals(2, listUser.size(), "Размер списка друзей User не соответствуют");
 		assertEquals(1, listFriends.size(), "Размер списка друзей Friend не соответствуют");
 		assertEquals(1, listMutualFriends.size(), "Размер списка общих друзей не равен 1");
-		assertEquals(user3.getId(), listMutualFriends.get(0).getId()
-				, "Значение в списке общих друзей не соответствует.");
+		assertEquals(user3.getId(), listMutualFriends.get(0).getId(), "Значение в списке общих друзей не соответствует.");
 
 		userService.deleteFriend(user.getId(), friend.getId());
 		listUser = userService.getFriends(user.getId());
@@ -268,9 +265,7 @@ class FilmorateApplicationTests {
 				ValidationException.class,
 				() -> userService.addModel(user2));
 
-		assertEquals("Email cannot be empty and must contain the \"@\" character"
-				, exception.getMessage()
-				, "exception message проверки email не верна");
+		assertEquals("Email cannot be empty and must contain the \"@\" character", exception.getMessage(), "exception message проверки email не верна");
 	}
 
 	@Test
