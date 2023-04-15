@@ -194,7 +194,6 @@ class FilmorateApplicationTests {
 	void testAllUserStorageMethods() {
 		user = userService.addModel(user);
 		List<User> usersList = userService.getAllModels();
-
 		assertEquals(user, usersList.get(0), "Пользователи не равны");
 		assertEquals(1, usersList.size(), "Размер списка не верно указан");
 
