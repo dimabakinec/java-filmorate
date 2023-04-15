@@ -39,7 +39,7 @@ class FilmorateApplicationTests {
 	private Film film;
 
 	@BeforeEach
-	void before(){
+	void before() {
 		film = new Film();
 		film.setName("film");
 		film.setDescription("Description");
@@ -89,9 +89,7 @@ class FilmorateApplicationTests {
 
 		assertEquals(1, filmList.size(), "Размер списка фильмов не соответствует ожидаемому");
 		assertEquals(1, filmList.get(0).getId(), "ID сформирован не верно");
-		assertEquals(filmService.findModelById(1).getId(), filmList.get(0).getId()
-				, "Модели Film не соответствуют");
-
+		assertEquals(filmService.findModelById(1).getId(), filmList.get(0).getId(), "Модели Film не соответствуют");
 		Film film3 = new Film();
 		film3.setName("film # 3");
 		film3.setDescription("Description film # 3");
@@ -127,8 +125,7 @@ class FilmorateApplicationTests {
 				ValidationException.class,
 				() -> filmService.addModel(film));
 
-		assertEquals("The release date can't be earlier - 1895-12-28", exception.getMessage()
-				, "exception message проверки дата релиза не верна");
+		assertEquals("The release date can't be earlier - 1895-12-28", exception.getMessage(), "exception message проверки дата релиза не верна");
 	}
 
 	@Test
@@ -147,12 +144,11 @@ class FilmorateApplicationTests {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> filmService.updateModel(film2));
-		assertEquals("model was not found by the passed ID: 999", exception.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: 999", exception.getMessage(), "exception проверки неверный");
 	}
 
 	@Test
-	void findFilmByInvalidIDShouldThrowException(){
+	void findFilmByInvalidIDShouldThrowException() {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> filmService.findModelById(999));
@@ -165,47 +161,35 @@ class FilmorateApplicationTests {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> filmService.putLike(1,-2));
-		assertEquals("model was not found by the passed ID: -2", exception.getMessage()
-				, "exception проверки неверный");
-
+		assertEquals("model was not found by the passed ID: -2", exception.getMessage(), "exception проверки неверный");
 		final NotFoundException exception2 = assertThrows(
 				NotFoundException.class,
 				() -> filmService.deleteLike(1,-2));
-		assertEquals("model was not found by the passed ID: -2", exception2.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: -2", exception2.getMessage(), "exception проверки неверный");
 	}
 
 	@Test
 	void GetAllAndGetInvalidIdGenres() {
 		Genre genreById = genreService.getGenreById(1);
 		assertEquals("Комедия", genreById.getName(), "Название жанров не верное.");
-
 		List<Genre> genres = genreService.getGenres();
-
 		assertEquals(6, genres.size(), "Размер жанров не соответствует ожидаемому.");
-
 		final NotFoundException exception3 = assertThrows(
 				NotFoundException.class,
 				() -> genreService.getGenreById(-2));
-		assertEquals("model was not found by the passed ID: -2", exception3.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: -2", exception3.getMessage(), "exception проверки неверный");
 	}
 
 	@Test
 	void GetAllAndGetInvalidIdRatings() {
 		Mpa rating = mpaService.getRatingById(1);
-
 		assertEquals("G", rating.getName(), "Название рейтинга не верное.");
-
 		List<Mpa> ratings = mpaService.getRatings();
-
 		assertEquals(5, ratings.size(), "Размер списка рейтингов не соответствует ожидаемому.");
-
 		final NotFoundException exception4 = assertThrows(
 				NotFoundException.class,
 				() -> mpaService.getRatingById(-2));
-		assertEquals("model was not found by the passed ID: -2", exception4.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: -2", exception4.getMessage(), "exception проверки неверный");
 	}
 	@Test
 	void testAllUserStorageMethods() {
@@ -302,9 +286,7 @@ class FilmorateApplicationTests {
 				ValidationException.class,
 				() -> userService.addModel(user3));
 
-		assertEquals("Login may not be empty or contain spaces"
-				, exception.getMessage()
-				, "exception message проверки Login не верна");
+		assertEquals("Login may not be empty or contain spaces", exception.getMessage(), "exception message проверки Login не верна");
 	}
 
 	@Test
@@ -346,8 +328,7 @@ class FilmorateApplicationTests {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> userService.updateModel(user6));
-		assertEquals("model was not found by the passed ID: 6", exception.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: 6", exception.getMessage(), "exception проверки неверный");
 	}
 
 	@Test
@@ -355,7 +336,6 @@ class FilmorateApplicationTests {
 		final NotFoundException exception = assertThrows(
 				NotFoundException.class,
 				() -> userService.findModelById(9999));
-		assertEquals("model was not found by the passed ID: 9999", exception.getMessage()
-				, "exception проверки неверный");
+		assertEquals("model was not found by the passed ID: 9999", exception.getMessage(), "exception проверки неверный");
 	}
 }
