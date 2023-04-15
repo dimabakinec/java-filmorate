@@ -43,8 +43,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User data) {
         String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
-        int count = jdbcTemplate.update(sql, data.getEmail(), data.getLogin(), data.getName()
-                , data.getBirthday(), data.getId());
+        int count = jdbcTemplate.update(sql, data.getEmail(), data.getLogin(), data.getName(), data.getBirthday(), data.getId());
         if (count == 0) {
             log.error(MODEL_NOT_FOUND.getMessage() + data.getId());
             throw new NotFoundException(MODEL_NOT_FOUND.getMessage() + data.getId());
@@ -61,10 +60,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User find(long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
-        return jdbcTemplate.query(sql, new UserMapper(), id)
-                .stream().
-                findAny().
-                orElseThrow(() -> new NotFoundException(MODEL_NOT_FOUND.getMessage() + id));
+        return jdbcTemplate.query(sql, new UserMapper(), id).stream().findAny().orElseThrow(() -> new NotFoundException(MODEL_NOT_FOUND.getMessage() + id));
     }
 
     @Override

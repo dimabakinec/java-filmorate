@@ -39,7 +39,7 @@ public class FriendDbStorage implements FriendStorage {
     }
 
     @Override
-    public List<User> getFriends(long id){
+    public List<User> getFriends(long id) {
         String sql = "SELECT * FROM users WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
         return jdbcTemplate.query(sql, new UserMapper(), id);
     }

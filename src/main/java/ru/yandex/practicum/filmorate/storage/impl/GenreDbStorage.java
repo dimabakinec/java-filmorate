@@ -38,10 +38,8 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Map<Long, List<Genre>> getGenreByFilm() {
         String sql = "SELECT fg.film_id, g.* FROM genre AS g, film_genre fg WHERE g.genre_id = fg.genre_id";
-        Map<Long, List<Genre>> listGenresByFilm = jdbcTemplate.query(sql
-                , rs -> {
+        Map<Long, List<Genre>> listGenresByFilm = jdbcTemplate.query(sql, rs -> {
                     Map<Long, List<Genre>> list = new HashMap<>();
-
                     while (rs.next()) {
                         long idFilm = rs.getLong("film_id");
                         List<Genre> listGenre = list.getOrDefault(idFilm, new ArrayList<>());
