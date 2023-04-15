@@ -190,6 +190,7 @@ class FilmorateApplicationTests {
 				() -> mpaService.getRatingById(-2));
 		assertEquals("model was not found by the passed ID: -2", exception4.getMessage(), "exception проверки неверный");
 	}
+
 	@Test
 	void testAllUserStorageMethods() {
 		user = userService.addModel(user);
