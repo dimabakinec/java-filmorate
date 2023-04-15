@@ -8,10 +8,11 @@ import java.time.LocalDate;
 import java.util.Set;
 
 
+@SuppressWarnings("checkstyle:WhitespaceAround")
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Film extends AbstractModel {
