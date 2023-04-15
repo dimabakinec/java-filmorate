@@ -12,24 +12,21 @@ import java.util.Map;
 @RestControllerAdvice(basePackages = "ru.yandex.practicum.filmorate.controller")
 public class ErrorHandler {
 
-    @SuppressWarnings("checkstyle:GenericWhitespace")
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String > handleValidationException(final ValidationException validationException) {
+    public Map<String, String> handleValidationException(final ValidationException validationException) {
         return Map.of("error", validationException.getMessage());
     }
 
-    @SuppressWarnings("checkstyle:GenericWhitespace")
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String > handleNotFoundException(final NotFoundException notFoundException) {
+    public Map<String, String> handleNotFoundException(final NotFoundException notFoundException) {
         return Map.of("error", notFoundException.getMessage());
     }
 
-    @SuppressWarnings("checkstyle:GenericWhitespace")
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String > handleException(final Throwable exception) {
+    @ResponseStatus (HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleException(final Throwable exception) {
         return Map.of("error", exception.getMessage());
     }
 }
