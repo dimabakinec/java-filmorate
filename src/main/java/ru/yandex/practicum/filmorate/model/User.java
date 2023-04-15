@@ -7,7 +7,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
-@SuppressWarnings("checkstyle:WhitespaceAround")
 @Getter
 @Setter
 @ToString
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class User extends AbstractModel{
+public class User extends AbstractModel {
 
     private long  id;
     @Email
