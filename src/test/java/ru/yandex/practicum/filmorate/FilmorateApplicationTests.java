@@ -168,7 +168,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void GetAllAndGetInvalidIdGenres() {
+	void getAllAndGetInvalidIdGenres() {
 		Genre genreById = genreService.getGenreById(1);
 		assertEquals("Комедия", genreById.getName(), "Название жанров не верное.");
 		List<Genre> genres = genreService.getGenres();
@@ -180,7 +180,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void GetAllAndGetInvalidIdRatings() {
+	void getAllAndGetInvalidIdRatings() {
 		Mpa rating = mpaService.getRatingById(1);
 		assertEquals("G", rating.getName(), "Название рейтинга не верное.");
 		List<Mpa> ratings = mpaService.getRatings();
