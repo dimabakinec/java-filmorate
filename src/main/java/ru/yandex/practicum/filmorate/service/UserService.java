@@ -27,7 +27,7 @@ public class UserService extends AbstractService<User> {
             log.error(EMAIL_CANNOT_BE_EMPTY.getMessage());
             throw new ValidationException(EMAIL_CANNOT_BE_EMPTY.getMessage());
         }
-        if (data.getLogin().contains(" ")){
+        if (data.getLogin().contains(" ")) {
             log.error(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
             throw new ValidationException(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
         }
