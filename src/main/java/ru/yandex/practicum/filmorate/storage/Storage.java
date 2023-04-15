@@ -4,8 +4,7 @@ import ru.yandex.practicum.filmorate.model.AbstractModel;
 
 import java.util.List;
 
-@SuppressWarnings("checkstyle:GenericWhitespace")
-public interface Storage <T extends AbstractModel> {
+public interface Storage<T extends AbstractModel> {
     T add(T data);
 
     T update(T data);
