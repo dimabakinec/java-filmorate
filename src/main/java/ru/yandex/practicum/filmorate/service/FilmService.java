@@ -3,107 +3,71 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
+import static ru.yandex.practicum.filmorate.Constants.DATE;
+import static ru.yandex.practicum.filmorate.message.Message.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FilmService {
+public class FilmService extends AbstractService<Film> {
 
-    private final FilmStorage filmStorage;
+    private final Storage<Film> filmStorage;
+    private final LikeStorage likeDbStorage;
+    private final UserService userService;
 
-    public Film findFilmById(final int id) {
-        Film film = filmStorage.findFilmById(id);
-        if (film == null) {
-            log.info("Film not found");
-            throw new NotFoundException("Film not found");
+    protected void dataValidator(Film film) {
+        if (film.getReleaseDate().isBefore(DATE)) {
+            log.error(RELEASE_DATE.getMessage() + DATE);
+            throw new ValidationException(RELEASE_DATE.getMessage() + DATE);
         }
-        return film;
     }
 
-    public MpaRating findMpaById(final int id) {
-        MpaRating mpa = filmStorage.findMpaById(id);
-        if (mpa == null) {
-            throw new NotFoundException("Mpa not found");
-        }
-        return mpa;
+    @Override
+    public Film addModel(Film data) {
+        super.addModel(data);
+        return filmStorage.add(data);
     }
 
-    public Genre findGenreById(final int id) {
-        Genre genre = filmStorage.findGenreById(id);
-        if (genre == null) {
-            throw new NotFoundException("Genre not found");
-        }
-        return genre;
+    @Override
+    public Film updateModel(Film data) {
+        super.updateModel(data);
+        return filmStorage.update(data);
     }
 
-
-    public Film addFilm(final Film film) {
-        FilmValidator.validate(film);
-        int id = filmStorage.addFilm(film);
-        film.setId(id);
-        return film;
+    @Override
+    public void deleteModelById(long id) {
+        filmStorage.delete(id);
     }
 
-    public Film updateFilm(final Film film) {
-        if (findFilmById(film.getId()) == null) {
-            log.info("Film not found");
-            throw new NotFoundException("Film not found");
-        }
-        FilmValidator.validate(film);
-        if (film.getGenres() != null) {
-            film.setGenres(film.getGenres().stream().distinct().collect(Collectors.toList()));
-        }
-        filmStorage.updateFilm(film);
-        return film;
+    @Override
+    public Film findModelById(long id) {
+        return filmStorage.find(id);
     }
 
-    public void deleteFilm(final int id) {
-        filmStorage.deleteFilm(id);
+    @Override
+    public List<Film> getAllModels() {
+        return filmStorage.getAll();
     }
 
-    public Collection<Film> findAllFilms() {
-        return filmStorage.findAllFilms();
+    public void putLike(long id, long userId) {
+        filmStorage.find(id); // Проверяем есть ли такой фильм.
+        userService.findModelById(userId); // Проверяем есть ли такой Id таблице users, иначе будет исключение.
+        likeDbStorage.putLike(id, userId);
     }
 
-    public Collection<Genre> findAllGenres() {
-        return filmStorage.findAllGenres();
+    public void deleteLike(long id, long userId) {
+        filmStorage.find(id); // Проверяем есть ли такой фильм.
+        userService.findModelById(userId); // Проверяем есть ли такой Id таблице users, иначе будет исключение.
+        likeDbStorage.deleteLike(id, userId);
     }
 
-    public Collection<MpaRating> findAllMpas() {
-        return filmStorage.findAllMpas();
-    }
-
-    public void addLike(final int filmId, final int userId) {
-        if (filmStorage.findFilmById(filmId) == null) {
-            log.info("Film not found");
-            throw new NotFoundException("Film not found");
-        }
-        filmStorage.addLike(filmId, userId);
-    }
-
-    public void deleteLike(final int filmId, final int userId) {
-        final Film film;
-        film = filmStorage.findFilmById(filmId);
-        if (film == null) {
-            log.info("Film not found");
-            throw new NotFoundException("Film not found");
-        }
-        if (!film.getLikes().contains(userId)) {
-            throw new NotFoundException("This user never liked this film in the first place");
-        }
-        filmStorage.deleteLike(filmId, userId);
-    }
-
-    public Collection<Film> findPopularFilms(final int count) {
-        return filmStorage.findPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count) {
+        return likeDbStorage.getPopularFilms(count);
     }
 }

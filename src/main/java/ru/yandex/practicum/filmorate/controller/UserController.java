@@ -1,58 +1,75 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.Collection;
+import javax.validation.Valid;
+import java.util.List;
+
+import static ru.yandex.practicum.filmorate.message.Message.*;
 
 @RestController
-@RequiredArgsConstructor
+@RequestMapping("/users")
+@Slf4j
 public class UserController {
-    @Autowired
+
     private final UserService userService;
 
-    @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
-        return userService.addUser(user);
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PutMapping("/users")
-    public User update(@RequestBody User user) {
-        return userService.updateUser(user);
+    @PostMapping
+    public User createUser(@Valid @RequestBody User user) {
+        log.info(ADD_MODEL.getMessage(), user);
+        return userService.addModel(user);
     }
 
-    @GetMapping("/users")
-    public Collection<User> findAll() {
-        return userService.findAllUsers();
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        log.info(UPDATED_MODEL.getMessage(), user);
+        userService.updateModel(user);
+        return user;
     }
 
-    @GetMapping("/users/{id}")
-    public User findUserById(@PathVariable int id) {
-        return userService.findUserById(id);
+    @SuppressWarnings("checkstyle:WhitespaceAround")
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable long id, @PathVariable long friendId){
+        log.info(ADD_FRIEND.getMessage(), id, friendId);
+        userService.putFriend(id, friendId);
     }
 
-    @GetMapping("/users/{id}/friends")
-    public Collection<User> findUserFriends(@PathVariable int id) {
-        return userService.findUserFriends(id);
+    @GetMapping
+    public List<User> getListUsers() {
+        log.info(REQUEST_ALL.getMessage());
+        return userService.getAllModels();
     }
 
-
-    @PutMapping("/users/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
-        userService.addFriend(id, friendId);
+    @GetMapping("/{id}/friends")
+    public List<User> getListFriends(@PathVariable long id) {
+        log.info(REQUEST_LIST_FRIENDS.getMessage(), id);
+        return userService.getFriends(id);
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable long id) {
+        log.info(REQUEST_BY_ID.getMessage(), id);
+        return  userService.findModelById(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info(REQUEST_MUTUAL_FRIENDS.getMessage(), id, otherId);
+        return userService.getListMutualFriends(id, otherId);
+    }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info(DELETE_FRIENDS.getMessage(), friendId, id);
         userService.deleteFriend(id, friendId);
-    }
-
-    @GetMapping("/users/{id}/friends/common/{otherId}")
-    public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        return userService.findCommonFriends(id, otherId);
     }
 }

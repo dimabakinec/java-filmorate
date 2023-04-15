@@ -3,92 +3,86 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
-import java.util.*;
+import java.util.List;
+
+import static ru.yandex.practicum.filmorate.message.Message.EMAIL_CANNOT_BE_EMPTY;
+import static ru.yandex.practicum.filmorate.message.Message.LOGIN_MAY_NOT_CONTAIN_SPACES;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
-    private final UserStorage userStorage;
+public class UserService extends AbstractService<User> {
 
-    public User findUserById(final int id) {
-        User user = userStorage.findUserById(id);
-        if (user == null) {
-            log.info("User not found");
-            throw new NotFoundException("User not found");
+    private final Storage<User> userStorage;
+    private final FriendStorage friendStorage;
+
+    @SuppressWarnings("checkstyle:WhitespaceAround")
+    protected void dataValidator(User data) {
+        if (data.getEmail().isBlank()) {
+            log.error(EMAIL_CANNOT_BE_EMPTY.getMessage());
+            throw new ValidationException(EMAIL_CANNOT_BE_EMPTY.getMessage());
         }
-        return user;
+        if (data.getLogin().contains(" ")){
+            log.error(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
+            throw new ValidationException(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
+        }
+        updateName(data);
     }
 
-    public Collection<User> findUserFriends(final int id) {
-        if (userStorage.findUserById(id) == null) {
-            log.info("User not found");
-            throw new NotFoundException("User not found");
-        }
-        return userStorage.findUserFriends(id);
-    }
-
-    public User addUser(final User user) {
-        UserValidator.validate(user);
-        if (user.getName() == null || user.getName().equals("")) {
-            log.info("Login is instead of name");
+    private void updateName(User user) {
+        String name = user.getName();
+        if (name == null || name.isBlank()) {
             user.setName(user.getLogin());
         }
-        int id = userStorage.addUser(user);
-        user.setId(id);
-        return user;
     }
 
-    public User updateUser(final User user) {
-        if (userStorage.findUserById(user.getId()) == null) {
-            log.info("User not found");
-            throw new NotFoundException("User not found");
-        }
-        UserValidator.validate(user);
-        if (user.getName() == null || user.getName().equals("")) {
-            log.info("Login is instead of name");
-            user.setName(user.getLogin());
-        }
-        userStorage.updateUser(user);
-        return user;
+    @Override
+    public User addModel(User data) {
+        super.addModel(data);
+        return userStorage.add(data);
     }
 
-    public void deleteUser(final int id) {
-        userStorage.deleteUser(id);
+    @Override
+    public User updateModel(User data) {
+        super.updateModel(data);
+        return userStorage.update(data);
     }
 
-    public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+    @Override
+    public void deleteModelById(long id) {
+        userStorage.delete(id);
     }
 
-    public void addFriend(final int userId, final int friendId) {
-        if (userStorage.findUserById(userId) == null || userStorage.findUserById(friendId) == null) {
-            log.info("User not found");
-            throw new NotFoundException("User not found");
-        }
-        userStorage.addFriendship(userId, friendId);
+    @Override
+    public User findModelById(long id) {
+        return userStorage.find(id);
     }
 
-    public void deleteFriend(final int userId, final int friendId) {
-        userStorage.deleteFriend(userId, friendId);
+    @Override
+    public List<User> getAllModels() {
+        return userStorage.getAll();
     }
 
-    public Collection<User> findCommonFriends(final int id, final int otherId) {
-        User user = userStorage.findUserById(id);
-        User otherUser = userStorage.findUserById(otherId);
-        if (user == null || otherUser == null) {
-            log.info("User not found");
-            throw new NotFoundException("User not found");
-        }
-        final Set<User> result = new HashSet<>();
-        result.addAll(user.getFriends());
-        result.retainAll(otherUser.getFriends());
+    public void putFriend(long id, long friendId) {
+        userStorage.find(id);
+        userStorage.find(friendId);
+        friendStorage.putFriend(id, friendId);
+    }
 
-        return result;
+    public void deleteFriend(long id, long friendId) {
+        friendStorage.deleteFriend(id, friendId);
+    }
+
+    public List<User> getFriends(long id) {
+        return friendStorage.getFriends(id);
+    }
+
+    public List<User> getListMutualFriends(long id, long otherId) {
+        return  friendStorage.getListMutualFriends(id, otherId);
     }
 }

@@ -1,74 +1,64 @@
 package ru.yandex.practicum.filmorate.controller;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
+import javax.validation.Valid;
+import java.util.List;
+
+import static ru.yandex.practicum.filmorate.message.Message.*;
 
 @RestController
-@RequiredArgsConstructor
+@RequestMapping("/films")
+@Slf4j
 public class FilmController {
-    @Autowired
+
     private final FilmService filmService;
 
-    @PostMapping(value = "/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
-        return filmService.addFilm(film);
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
-    @PutMapping("/films")
-    public Film update(@RequestBody Film film) {
-        return filmService.updateFilm(film);
+    @PostMapping
+    public Film saveFilm(@Valid @RequestBody Film film) {
+        log.info(ADD_MODEL.getMessage(), film);
+        return filmService.addModel(film);
     }
 
-    @GetMapping("/films")
-    public Collection<Film> findAllFilms() {
-        return filmService.findAllFilms();
+    @PutMapping
+    public Film updateFilm(@RequestBody Film film) {
+        log.info(UPDATED_MODEL.getMessage(), film);
+        return filmService.updateModel(film);
     }
 
-    @GetMapping("/genres")
-    public Collection<Genre> findAllGenres() {
-        return filmService.findAllGenres();
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable long id, @PathVariable long userId) {
+        log.info(REQUEST_TO_LIKE.getMessage(), id, userId);
+        filmService.putLike(id, userId);
     }
 
-    @GetMapping("/films/{id}")
-    public Film findFilmById(@PathVariable int id) {
-        return filmService.findFilmById(id);
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable long id) {
+        log.info(REQUEST_BY_ID.getMessage(), id);
+        return filmService.findModelById(id);
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
-    public void addLike(@PathVariable int id, @PathVariable int userId) {
-        filmService.addLike(id, userId);
+    @GetMapping
+    public List<Film> listFilms() {
+        log.info(REQUEST_ALL.getMessage());
+        return filmService.getAllModels();
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
-    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
+    @GetMapping({"/popular"})
+    public List<Film> getListPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
+        log.info(REQUEST_POPULAR.getMessage());
+        return filmService.getPopularFilms(count);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+        log.info(DELETE_LIKE.getMessage(), id, userId);
         filmService.deleteLike(id, userId);
-    }
-
-    @GetMapping("/films/popular")
-    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        return filmService.findPopularFilms(count);
-    }
-
-    @GetMapping("/mpa/{id}")
-    public MpaRating findMpaById(@PathVariable int id) {
-        return filmService.findMpaById(id);
-    }
-
-    @GetMapping("/genres/{id}")
-    public Genre findGenreById(@PathVariable int id) {
-        return filmService.findGenreById(id);
-    }
-
-    @GetMapping("/mpa")
-    public Collection<MpaRating> findAllMpas() {
-        return filmService.findAllMpas();
     }
 }
