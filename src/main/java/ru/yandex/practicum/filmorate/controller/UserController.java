@@ -36,7 +36,6 @@ public class UserController {
         return user;
     }
 
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id, @PathVariable long friendId){
         log.info(ADD_FRIEND.getMessage(), id, friendId);
