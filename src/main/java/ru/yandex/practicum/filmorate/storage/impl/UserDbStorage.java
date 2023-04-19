@@ -46,7 +46,6 @@ public class UserDbStorage implements UserStorage {
         int count = jdbcTemplate.update(sql, data.getEmail(), data.getLogin(), data.getName(), data.getBirthday(), data.getId());
         if (count == 0) {
             log.error(MODEL_NOT_FOUND.getMessage() + data.getId());
-            throw new NotFoundException(MODEL_NOT_FOUND.getMessage() + data.getId());
         }
         return find(data.getId());
     }
