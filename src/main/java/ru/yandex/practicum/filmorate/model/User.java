@@ -1,27 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(exclude = {"id"}, callSuper = false)
-@AllArgsConstructor
+@Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class User extends AbstractModel {
-
-    private long  id;
+public class User {
+    private long id;
+    @NotNull
     @Email
     private String email;
     @NotBlank
     private String login;
     private String name;
+    @NotNull
     @PastOrPresent
     private LocalDate birthday;
 }

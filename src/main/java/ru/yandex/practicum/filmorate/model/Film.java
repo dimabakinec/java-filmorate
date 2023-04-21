@@ -1,30 +1,26 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Film extends AbstractModel {
+public class Film {
+    private long id;
     @NotBlank
-    private String name; // название
+    private String name;
+    @NotBlank
     @Size(max = 200)
-    private String description; // описание
+    private String description;
     @NotNull
-    private LocalDate releaseDate; // дата релиза
+    private LocalDate releaseDate;
     @Positive
-    private int duration; // продолжительность фильма
+    private int duration;
     @NotNull
-    private Mpa mpa; // id рейтинга
-    private Set<Genre> genres; // жанры
-    @JsonIgnore
-    private int rate;
+    private Mpa mpa;
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 }

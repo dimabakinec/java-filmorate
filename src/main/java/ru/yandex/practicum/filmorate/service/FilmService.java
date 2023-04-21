@@ -1,73 +1,58 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.dao.interf.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.LikesDbStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.List;
-import static ru.yandex.practicum.filmorate.Constants.DATE;
-import static ru.yandex.practicum.filmorate.message.Message.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
-public class FilmService extends AbstractService<Film> {
+public class FilmService {
+    private final FilmDbStorage filmStorage;
+    private final LikesDbStorage likeStorage;
+    private final GenreDbStorage genreStorage;
 
-    private final Storage<Film> filmStorage;
-    private final LikeStorage likeDbStorage;
-    private final UserService userService;
-
-    protected void dataValidator(Film film) {
-        if (film.getReleaseDate().isBefore(DATE)) {
-            log.error(RELEASE_DATE.getMessage() + DATE);
-            throw new ValidationException(RELEASE_DATE.getMessage() + DATE);
-        }
+    public void setLike(Long userId, Film film) {
+        likeStorage.setLike(userId, film);
     }
 
-    @Override
-    public Film addModel(Film data) {
-        super.addModel(data);
-        return filmStorage.add(data);
+    public void deleteLike(Long userId, Film film) {
+        likeStorage.deleteLike(userId, film);
     }
 
-    @Override
-    public Film updateModel(Film data) {
-        super.updateModel(data);
-        return filmStorage.update(data);
+    public List<Film> getTop(Long count) {
+        List<Film> films = likeStorage.getTop(count);
+        genreStorage.addGenresToFilms(films);
+        return films;
     }
 
-    @Override
-    public void deleteModelById(long id) {
-        filmStorage.delete(id);
+    public Film create(Film film) {
+        return filmStorage.create(film);
     }
 
-    @Override
-    public Film findModelById(long id) {
-        return filmStorage.find(id);
+    public void delete(Film film) {
+        filmStorage.delete(film);
     }
 
-    @Override
-    public List<Film> getAllModels() {
-        return filmStorage.getAll();
+    public Film update(Film film) {
+        return filmStorage.update(film);
     }
 
-    public void putLike(long id, long userId) {
-        filmStorage.find(id); // Проверяем есть ли такой фильм.
-        userService.findModelById(userId); // Проверяем есть ли такой Id таблице users, иначе будет исключение.
-        likeDbStorage.putLike(id, userId);
+    public List<Film> getFilms() {
+        List<Film> films = filmStorage.getFilms();
+        genreStorage.addGenresToFilms(films);
+        return films;
     }
 
-    public void deleteLike(long id, long userId) {
-        filmStorage.find(id); // Проверяем есть ли такой фильм.
-        userService.findModelById(userId); // Проверяем есть ли такой Id таблице users, иначе будет исключение.
-        likeDbStorage.deleteLike(id, userId);
-    }
-
-    public List<Film> getPopularFilms(Integer count) {
-        return likeDbStorage.getPopularFilms(count);
+    public Film getById(long id) {
+        Film film = filmStorage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Фильм с таким ID не найден."));
+        genreStorage.addGenresToFilms(List.of(film));
+        return film;
     }
 }

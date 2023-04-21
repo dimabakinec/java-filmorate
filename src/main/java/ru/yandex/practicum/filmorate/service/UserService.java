@@ -1,88 +1,53 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.dao.interf.FriendsDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.UserDbStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
-
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.message.Message.EMAIL_CANNOT_BE_EMPTY;
-import static ru.yandex.practicum.filmorate.message.Message.LOGIN_MAY_NOT_CONTAIN_SPACES;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService extends AbstractService<User> {
+public class UserService {
+    private final UserDbStorage storage;
+    private final FriendsDbStorage friendsDbStorage;
 
-    private final Storage<User> userStorage;
-    private final FriendStorage friendStorage;
-
-    @SuppressWarnings("checkstyle:WhitespaceAround")
-    protected void dataValidator(User data) {
-        if (data.getEmail().isBlank()) {
-            log.error(EMAIL_CANNOT_BE_EMPTY.getMessage());
-            throw new ValidationException(EMAIL_CANNOT_BE_EMPTY.getMessage());
-        }
-        if (data.getLogin().contains(" ")) {
-            log.error(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
-            throw new ValidationException(LOGIN_MAY_NOT_CONTAIN_SPACES.getMessage());
-        }
-        updateName(data);
+    public void addFriend(User user, User friend) {
+        friendsDbStorage.makeFriend(user, friend);
     }
 
-    private void updateName(User user) {
-        String name = user.getName();
-        if (name == null || name.isBlank()) {
-            user.setName(user.getLogin());
-        }
+    public void deleteFriend(User user, User friend) {
+        friendsDbStorage.deleteFriend(user, friend);
     }
 
-    @Override
-    public User addModel(User data) {
-        super.addModel(data);
-        return userStorage.add(data);
+    public List<User> getMutualFriends(long userId, long friendId) {
+        return friendsDbStorage.getMutualFriends(userId, friendId);
     }
 
-    @Override
-    public User updateModel(User data) {
-        super.updateModel(data);
-        return userStorage.update(data);
+    public User create(User user) {
+        return storage.create(user);
     }
 
-    @Override
-    public void deleteModelById(long id) {
-        userStorage.delete(id);
+    public void delete(User user) {
+        storage.delete(user);
     }
 
-    @Override
-    public User findModelById(long id) {
-        return userStorage.find(id);
+    public void update(User user) {
+        storage.update(user);
     }
 
-    @Override
-    public List<User> getAllModels() {
-        return userStorage.getAll();
+    public List<User> getUsers() {
+        return storage.getAll();
     }
 
-    public void putFriend(long id, long friendId) {
-        userStorage.find(id);
-        userStorage.find(friendId);
-        friendStorage.putFriend(id, friendId);
+    public User getById(long id) {
+        return storage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким ID не существует."));
     }
 
-    public void deleteFriend(long id, long friendId) {
-        friendStorage.deleteFriend(id, friendId);
-    }
-
-    public List<User> getFriends(long id) {
-        return friendStorage.getFriends(id);
-    }
-
-    public List<User> getListMutualFriends(long id, long otherId) {
-        return  friendStorage.getListMutualFriends(id, otherId);
+    public List<User> getFriends(long userId) {
+        return friendsDbStorage.getFriends(userId);
     }
 }
