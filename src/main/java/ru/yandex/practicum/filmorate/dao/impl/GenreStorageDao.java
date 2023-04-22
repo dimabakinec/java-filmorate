@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 public class GenreStorageDao implements GenreDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreMapper genreMapper;
-    private final static String GET_GENRES = "SELECT * FROM GENRE";
-    private final static String GET_GENRE_BY_ID = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
-    private final static String GENRE_MAPPER = "SELECT FG.FILM_ID, G.GENRE_ID, G.NAME FROM GENRE G INNER JOIN FILM_GENRE FG " +
+    private static final String GET_GENRES = "SELECT * FROM GENRE";
+    private static final String GET_GENRE_BY_ID = "SELECT * FROM GENRE WHERE GENRE_ID = ?";
+    private static final String GENRE_MAPPER = "SELECT FG.FILM_ID, G.GENRE_ID, G.NAME FROM GENRE G INNER JOIN FILM_GENRE FG " +
             "ON G.GENRE_ID = FG.GENRE_ID WHERE FILM_ID IN (%s) ORDER BY GENRE_ORDER";
 
 
@@ -56,7 +56,7 @@ public class GenreStorageDao implements GenreDbStorage {
         }
         String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
         SqlRowSet rs = jdbcTemplate.queryForRowSet(String.format(GENRE_MAPPER, inSql), ids.toArray());
-        while(rs.next()) {
+        while (rs.next()) {
             Long filmId = rs.getLong("FILM_ID");
             Genre genre = Genre.builder()
                     .id(rs.getInt("GENRE_ID"))
