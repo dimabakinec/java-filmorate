@@ -21,11 +21,11 @@ import java.util.*;
 public class UserStorageDao implements UserDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserMapper userMapper;
-    private final static String CREATE = "INSERT INTO USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
-    private final static String DELETE = "DELETE FROM USERS WHERE USER_ID = ?";
-    private final static String UPDATE = "UPDATE USERS SET USER_NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ? WHERE USER_ID = ?";
-    private final static String GET_USERS = "SELECT * FROM USERS";
-    private final static String GET_BY_ID = "SELECT* FROM USERS WHERE USER_ID = ?";
+    private static final String CREATE = "INSERT INTO USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
+    private static final String DELETE = "DELETE FROM USERS WHERE USER_ID = ?";
+    private static final String UPDATE = "UPDATE USERS SET USER_NAME = ?, LOGIN = ?, EMAIL = ?, BIRTHDAY = ? WHERE USER_ID = ?";
+    private static final String GET_USERS = "SELECT * FROM USERS";
+    private static final String GET_BY_ID = "SELECT* FROM USERS WHERE USER_ID = ?";
 
     @Override
     public User create(User user) {
