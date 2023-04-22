@@ -16,9 +16,9 @@ import java.util.List;
 public class FriendsStorageDao implements FriendsDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String GET_FRIENDS_OF_USER = "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID =?)";
-    private final static String MAKE_FRIEND = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID) VALUES (?, ?)";
-    private final static String DELETE_FRIEND = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+    private static final String GET_FRIENDS_OF_USER = "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID =?)";
+    private static final String MAKE_FRIEND = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID) VALUES (?, ?)";
+    private static final String DELETE_FRIEND = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
     private static final String GET_MUTUAL_FRIENDS = "SELECT * FROM USERS U, FRIENDS F, FRIENDS O " +
             "WHERE U.USER_ID = F.FRIEND_ID AND U.USER_ID = O.FRIEND_ID AND F.USER_ID = ? AND O.USER_ID = ?";
 
