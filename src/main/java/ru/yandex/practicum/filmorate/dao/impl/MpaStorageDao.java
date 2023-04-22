@@ -19,8 +19,8 @@ public class MpaStorageDao implements MpaDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaMapper mpaMapper;
 
-    private final static String GET_ALL_MPA = "SELECT * FROM MPA";
-    private final static String GET_MPA_BY_ID = "SELECT * FROM MPA WHERE MPA_ID = ?";
+    private static final String GET_ALL_MPA = "SELECT * FROM MPA";
+    private static final String GET_MPA_BY_ID = "SELECT * FROM MPA WHERE MPA_ID = ?";
 
     @Override
     public List<Mpa> getAll() {
