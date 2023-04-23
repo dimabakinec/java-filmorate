@@ -6,8 +6,12 @@ import java.util.Optional;
 
 public interface UserDbStorage {
     User create(User user);
+
     void delete(User user);
+
     User update(User user);
+
     List<User> getAll();
+
     Optional<User> getById(long id);
 }
