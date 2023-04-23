@@ -43,7 +43,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateUserTest(){
+    public void updateUserTest() {
         dbStorage.update(
                 User.builder()
                         .id(1)
@@ -57,7 +57,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getAllUsers(){
+    public void getAllUsers() {
         dbStorage.create(goodUser);
         dbStorage.create(goodUser2);
         List<User> users = dbStorage.getAll();
@@ -65,7 +65,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserById(){
+    public void getUserById() {
         assertThat(dbStorage.getById(1))
                 .isPresent()
                 .hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("id", 1L));

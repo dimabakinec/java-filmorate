@@ -23,7 +23,7 @@ public class FilmControllerTest {
     private final FilmStorageDao dbStorage;
 
     @Test
-    public void createFilmTest(){
+    public void createFilmTest() {
         Film film = Film.builder()
                 .id(1)
                 .name("Kill Bill")
@@ -39,7 +39,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void updateFilmTest(){
+    public void updateFilmTest() {
 
         dbStorage.update(
                 Film.builder()
@@ -57,7 +57,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void getAllFilms(){
+    public void getAllFilms() {
         dbStorage.create(Film.builder()
                 .id(1)
                 .name("Kill Bill")
@@ -83,7 +83,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void getFilmById(){
+    public void getFilmById() {
 
         assertThat(dbStorage.getById(1))
                 .isPresent()
