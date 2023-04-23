@@ -5,9 +5,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FilmDbStorage {
+
     Film create(Film film);
+
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     void delete(Film film);
+
     Film update(Film film);
-    List<Film> getFilms();
-    Optional<Film> getById(long id);
+
+    @SuppressWarnings("checkstyle:GenericWhitespace")
+    List <Film> getFilms();
+
+    @SuppressWarnings("checkstyle:GenericWhitespace")
+    Optional <Film> getById(long id);
 }
