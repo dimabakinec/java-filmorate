@@ -20,6 +20,7 @@ public class Genre {
         Genre genre = (Genre) obj;
         return id == genre.getId();
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;
