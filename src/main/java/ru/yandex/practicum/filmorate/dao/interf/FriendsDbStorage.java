@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface FriendsDbStorage {
     void makeFriend(User user, User friend);
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
+
     void deleteFriend(User user, User friend);
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
+
     List<User> getFriends(long userId);
-    @SuppressWarnings("checkstyle:EmptyLineSeparator")
+
     List<User> getMutualFriends(long userId, long friendId);
 }
