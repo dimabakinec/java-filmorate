@@ -8,8 +8,11 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
     private int id = 0;
     private final Map<Long, Film> films = new HashMap<>();
+
     private final Map<Integer, Genre> genres = new HashMap<>();
+
     private final Map<Integer, Mpa> MPAs = new HashMap<>();
+
     @Override
     public void create(Film film) {
         film.setId(++id);
