@@ -14,8 +14,8 @@ public interface FilmDbStorage {
     Film update(Film film);
 
     @SuppressWarnings("checkstyle:GenericWhitespace")
-    List <Film> getFilms();
+    List < Film > getFilms();
 
     @SuppressWarnings("checkstyle:GenericWhitespace")
-    Optional <Film> getById(long id);
+    Optional < Film > getById(long id);
 }
