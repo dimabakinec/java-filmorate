@@ -8,12 +8,20 @@ import java.util.Optional;
 
 public interface FilmStorage {
     void create(Film film);
+
     void delete(Film film);
+
     void update(Film film);
+
     List<Film> getFilms();
+
     Optional<Film> getById(long id);
+
     List<Genre> getGenres();
+
     Optional<Genre> getGenreById(int id);
+
     List<Mpa> getMPAs();
+
     Optional<Mpa> getMPAById(int id);
 }
