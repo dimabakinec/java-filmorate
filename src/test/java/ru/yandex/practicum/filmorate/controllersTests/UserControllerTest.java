@@ -38,7 +38,8 @@ public class UserControllerTest {
             .build();
 
     @Test
-    public void createUserTest(){
+    public void createUserTest() {
+
         assertEquals(1, goodUser.getId());
     }
 
