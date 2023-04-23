@@ -11,7 +11,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Genre> genres = new HashMap<>();
 
-    private final Map<Integer, Mpa> MPAs = new HashMap<>();
+    private final Map<Integer, Mpa> mpas = new HashMap<>();
 
     @Override
     public void create(Film film) {
@@ -51,11 +51,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Mpa> getMPAs() {
-        return new ArrayList<>(MPAs.values());
+        return new ArrayList<>(mpas.values());
     }
 
     @Override
     public Optional<Mpa> getMPAById(int id) {
-        return Optional.of(MPAs.get(id));
+        return Optional.of(mpas.get(id));
     }
 }
