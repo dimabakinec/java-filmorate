@@ -1,68 +1,58 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dao.interf.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.LikesDbStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Collection;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
+    private final FilmDbStorage filmStorage;
+    private final LikesDbStorage likeStorage;
+    private final GenreDbStorage genreStorage;
 
-    private int nextId = 0;
-    private final FilmStorage filmStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
+    public void setLike(Long userId, Film film) {
+        likeStorage.setLike(userId, film);
     }
 
-    private int generateId() {
-        return ++nextId;
+    public void deleteLike(Long userId, Film film) {
+        likeStorage.deleteLike(userId, film);
     }
 
-    public Film findFilmById(final int id) {
-        return filmStorage.findFilmById(id);
+    public List<Film> getTop(Long count) {
+        List<Film> films = likeStorage.getTop(count);
+        genreStorage.addGenresToFilms(films);
+        return films;
     }
 
-    public void addFilm(final Film film) {
-        film.setId(generateId());
-        filmStorage.addFilm(film);
+    public Film create(Film film) {
+        return filmStorage.create(film);
     }
 
-    public Film updateFilm(final Film film) {
-        filmStorage.updateFilm(film);
+    public void delete(Film film) {
+        filmStorage.delete(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    public List<Film> getFilms() {
+        List<Film> films = filmStorage.getFilms();
+        genreStorage.addGenresToFilms(films);
+        return films;
+    }
+
+    public Film getById(long id) {
+        Film film = filmStorage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Фильм с таким ID не найден."));
+        genreStorage.addGenresToFilms(List.of(film));
         return film;
     }
-
-    public void deleteFilm(final int id) {
-        filmStorage.deleteFilm(id);
-    }
-
-    public Collection<Film> findAllFilms() {
-        return filmStorage.findAllFilms();
-    }
-
-    public void addLike(final int id, final int userId) {
-        final Film film;
-        film = filmStorage.findFilmById(id);
-        film.addLike(userId);
-        filmStorage.updateFilm(film);
-    }
-
-    public void deleteLike(final int id, final int userId) {
-        final Film film;
-        film = filmStorage.findFilmById(id);
-        if (!film.getLikes().contains(userId)) {
-            throw new NotFoundException("This user never liked this film in the first place");
-        }
-        film.deleteLike(userId);
-    }
-
-    public Collection<Film> findPopularFilms(final int count) {
-        return filmStorage.findPopularFilms(count);
-    }
-
 }

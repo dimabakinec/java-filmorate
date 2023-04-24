@@ -1,82 +1,53 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.interf.FriendsDbStorage;
+import ru.yandex.practicum.filmorate.dao.interf.UserDbStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-
-import java.util.*;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
+    private final UserDbStorage storage;
+    private final FriendsDbStorage friendsDbStorage;
 
-    private int nextId = 0;
-    private final UserStorage userStorage;
-
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public void addFriend(User user, User friend) {
+        friendsDbStorage.makeFriend(user, friend);
     }
 
-    private int generateId() {
-        return ++nextId;
+    public void deleteFriend(User user, User friend) {
+        friendsDbStorage.deleteFriend(user, friend);
     }
 
-    public User findUserById(final int id) {
-        return userStorage.findUserById(id);
+    public List<User> getMutualFriends(long userId, long friendId) {
+        return friendsDbStorage.getMutualFriends(userId, friendId);
     }
 
-    public Collection<User> findUserFriends(final int id) {
-        return userStorage.findUserFriends(id);
+    public User create(User user) {
+        return storage.create(user);
     }
 
-    public void addUser(final User user) {
-        user.setId(generateId());
-        userStorage.addUser(user);
+    public void delete(User user) {
+        storage.delete(user);
     }
 
-    public User updateUser(final User user) {
-        userStorage.updateUser(user);
-        return user;
+    public void update(User user) {
+        storage.update(user);
     }
 
-    public void deleteUser(final int id) {
-        userStorage.deleteUser(id);
+    public List<User> getUsers() {
+        return storage.getAll();
     }
 
-    public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+    public User getById(long id) {
+        return storage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с таким ID не существует."));
     }
 
-    public void addFriend(final int userId, final int friendId) {
-        User user;
-        user = userStorage.findUserById(userId);
-        user.addFriend(friendId);
-        userStorage.updateUser(user);
-        user = userStorage.findUserById(friendId);
-        user.addFriend(userId);
-        userStorage.updateUser(user);
-    }
-
-    public void deleteFriend(final int userId, final int friendId) {
-        final User user;
-        user = userStorage.findUserById(userId);
-        user.deleteFriend(friendId);
-        userStorage.updateUser(user);
-    }
-
-    public Collection<User> findCommonFriends(final int id, final int otherId) {
-        final Set<Integer> commonFriendsIds1;
-        final Set<Integer> commonFriendsIds2;
-        final Set<Integer> result = new HashSet<>();
-        commonFriendsIds1 = userStorage.findUserById(id).getFriends();
-        commonFriendsIds2 = userStorage.findUserById(otherId).getFriends();
-        result.addAll(commonFriendsIds1);
-        result.retainAll(commonFriendsIds2);
-        List<User> commonFriends = new ArrayList<>();
-        for (final int commonFriendsIds : result) {
-            commonFriends.add(userStorage.findUserById(commonFriendsIds));
-        }
-        return commonFriends;
+    public List<User> getFriends(long userId) {
+        return friendsDbStorage.getFriends(userId);
     }
 }

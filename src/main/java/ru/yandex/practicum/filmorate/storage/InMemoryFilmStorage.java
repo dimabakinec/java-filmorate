@@ -1,48 +1,61 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import java.util.*;
 
-@Component
 public class InMemoryFilmStorage implements FilmStorage {
+    private int id = 0;
+    private final Map<Long, Film> films = new HashMap<>();
 
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Genre> genres = new HashMap<>();
+
+    private final Map<Integer, Mpa> mpas = new HashMap<>();
 
     @Override
-    public void addFilm(final Film film) {
+    public void create(Film film) {
+        film.setId(++id);
         films.put(film.getId(), film);
     }
 
     @Override
-    public Film findFilmById(final int id) {
-        return films.get(id);
+    public void delete(Film film) {
+        films.remove(film.getId(), film);
     }
 
     @Override
-    public void deleteFilm(final int id) {
-        films.remove(id);
-    }
-
-    @Override
-    public void updateFilm(final Film film) {
+    public void update(Film film) {
         films.put(film.getId(), film);
     }
 
     @Override
-    public Collection<Film> findAllFilms() {
-        return films.values();
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
     }
 
     @Override
-    public Collection<Film> findPopularFilms(final int count) {
-        final List<Film> popularFilms = new ArrayList<>(films.values());
-        Collections.sort(popularFilms);
-        if (count < popularFilms.size()) {
-            return popularFilms.subList(0, count);
-        } else {
-            return popularFilms;
-        }
+    public Optional<Film> getById(long id) {
+        return Optional.ofNullable(films.get(id));
+    }
+
+    @Override
+    public List<Genre> getGenres() {
+        return new ArrayList<>(genres.values());
+    }
+
+    @Override
+    public Optional<Genre> getGenreById(int id) {
+        return Optional.of(genres.get(id));
+    }
+
+    @Override
+    public List<Mpa> getMPAs() {
+        return new ArrayList<>(mpas.values());
+    }
+
+    @Override
+    public Optional<Mpa> getMPAById(int id) {
+        return Optional.of(mpas.get(id));
     }
 }
